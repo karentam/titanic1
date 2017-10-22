@@ -1,0 +1,97 @@
+---
+title: "Titanic1"
+author: "H Karen Tam"
+date: "October 21, 2017"
+output: html_document
+---
+
+### Data Wrangling Exercise 2: Dealing with missing values
+
+#### Load Packages and Read csv File
+```{r}
+
+# Load package
+
+suppressMessages(library(dplyr))
+suppressMessages(library(tidyr))
+
+# Read the csv file
+
+titanic_cleaning <- read.csv("titanic_original.csv")
+titanic_original <- read.csv("titanic_original.csv")
+
+```
+
+#### Port of Embarkation
+
+```{r}
+
+# Find the missing values and replace them with S. (Caution: Sometimes a missing value might be read into R as a blank or empty string.)
+
+titanic_cleaning <- titanic_cleaning %>% 
+  mutate (embarked = sub("^$", "S", embarked))
+
+```
+
+#### Age
+
+```{r}
+
+# Calculate the mean of the Age column and use that value to populate the missing values.
+
+# Replace NA in the column to the mean of the same column.
+
+titanic_cleaning$age [which(is.na(titanic_cleaning$age))] <- mean(titanic_cleaning$age, na.rm = TRUE)
+
+```
+
+#### What To Replace Missing Values
+
+The mean (29.88113) and median (28) of the age are very close. In addition, replacing other values may affect the mean of age. Therefore, I would use the mean to replace missing values. 
+
+```{r}
+
+# Check mean and median of age.
+
+mean (titanic_original$age, na.rm = TRUE)
+median (titanic_original$age, na.rm = TRUE)
+
+```
+
+#### Lifeboat
+
+```{r}
+
+# Fill empty slots with the string 'None' or 'NA' in the boat column.
+
+titanic_cleaning <- titanic_cleaning %>% 
+  mutate (boat = sub("^$", "NA", boat))
+
+```
+
+#### Cabin
+
+Does it make sense to fill missing cabin numbers with a value? What does a missing value here mean? 
+
+It does not make sense to fill missing cabin numbers with a value. It is not possible to make a guess based on values in other columns, and cabin numbers are not numerical or categorical.  If the person survived, he or she may be able to provide the cabin number. However, both surviving and non-suviving groups have missing cabin numbers in the dataset. 
+
+```{r}
+# Create a new column has_cabin_number which has 1 if there is a cabin number, and 0 otherwise.
+
+titanic_cleaning <- titanic_cleaning %>% 
+  mutate(cabin_number = ifelse(cabin == "", 0, 1))
+  
+```
+
+#### Save the Cleaned File as .csv
+
+```{r}
+# Save the cleaned file as .csv
+
+write.csv(titanic_cleaning, "titanic_clean.csv", row.names = FALSE)
+
+```
+
+
+
+
